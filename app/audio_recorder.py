@@ -5,7 +5,7 @@ FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 44100
 CHUNK = 1024
-RECORD_SECONDS = 5
+RECORD_SECONDS = 30
 
 def find_loopback_device():
     p = pyaudio.PyAudio()
@@ -13,6 +13,7 @@ def find_loopback_device():
         dev_info = p.get_device_info_by_index(i)
         if "Virtual Audio Cable" in dev_info.get('name'):
             p.terminate()
+            print(f'Found input index {i}.')
             return i
     p.terminate()
     return None

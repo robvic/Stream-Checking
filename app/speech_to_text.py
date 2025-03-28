@@ -15,4 +15,4 @@ def recognize_file():
         print("Transcription:", result)
 
         with open(output_file, 'w') as f:
-            f = result
+            f.write(result)
