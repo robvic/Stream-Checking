@@ -1,3 +1,5 @@
+import os
+from datetime import datetime as dt
 import pyaudio
 import wave
 
@@ -6,6 +8,7 @@ CHANNELS = 1
 RATE = 44100
 CHUNK = 1024
 RECORD_SECONDS = 30
+AUDIO_PATH = "./files/audios/"
 
 def find_loopback_device():
     p = pyaudio.PyAudio()
@@ -25,7 +28,8 @@ def record_audio(duration,
                  rate=RATE, 
                  chunk=CHUNK ):
     p = pyaudio.PyAudio()
-    OUTPUT_FILENAME = f"./files/audio_output.wav"
+    timestamp = dt.now().strftime("%Y-%m-%d_%H-%M-%S")
+    output_file = os.join.path(AUDIO_PATH, f"audio_output_{timestamp}.wav") 
     stream = p.open(format=format,
                     channels=channels,
                     rate=rate,
@@ -46,13 +50,18 @@ def record_audio(duration,
     stream.close()
     p.terminate()
 
-    wf = wave.open(OUTPUT_FILENAME, 'wb')
+    wf = wave.open(output_file, 'wb')
     wf.setnchannels(channels)
     wf.setsampwidth(p.get_sample_size(format))
     wf.setframerate(rate)
     wf.writeframes(b''.join(frames))
     wf.close()
+    return output_file
+
+def loop_execution(device_index):
+    while True:
+        record_audio(RECORD_SECONDS, device_index)
 
 if __name__ == "__main__":
     device_index = find_loopback_device()
-    record_audio(RECORD_SECONDS, device_index)
+    file = record_audio(RECORD_SECONDS, device_index)

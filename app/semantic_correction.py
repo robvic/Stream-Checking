@@ -1,5 +1,11 @@
 import os
+import glob
+import time
+import re
 from openai import OpenAI
+
+SPELLCHECK_PATH = "./files/spellchecked_transcriptions/"
+CORRECTED_PATH = "./files/corrected_transcriptions/"
 
 INPUT_FILE = "./files/transcription_spellchecked.txt"
 OUTPUT_FILE = "./files/transcription_corrected.txt"
@@ -10,12 +16,17 @@ Texto:
 
 """
 
-def read_file(file=INPUT_FILE):
-    with open(file, 'r') as f:
-        text = f.read()
-    return text
+def get_timestamp(input_file):
+    timestamp = re.search(r'(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})', input_file).group(1)
+    return timestamp
 
-def send_message(text):
+def correct_text(input_file):
+    timestamp = get_timestamp(input_file)
+    output_file = os.path.join(CORRECTED_PATH, f"transcription_{timestamp}.txt" )
+
+    with open(input_file, 'r') as f:
+        text = f.read()
+
     client = OpenAI(api_key=os.environ.get("GPT_KEY"))
 
     completion = client.chat.completions.create(
@@ -26,14 +37,10 @@ def send_message(text):
         }]
     )
 
-    return completion.choices[0].message.content
+    content =  completion.choices[0].message.content
 
-def write_file(text, file=OUTPUT_FILE):
-    with open(file, 'w+') as f:
-        f.write(text)
-
-if __name__ == "__main__":
-    text = read_file()
-    response = send_message(text)
-    write_file(response)
+    with open(output_file, 'w+') as f:
+        f.write(content)
+    
+    return output_file
 
