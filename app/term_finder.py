@@ -1,24 +1,27 @@
 import os
+import json
+from datetime import datetime as dt
 import hashlib
 from elasticsearch import Elasticsearch
 
 es = Elasticsearch('http://localhost:9200')
 
-INDEX_NAME = "Documentos"
-INPUT = "./files"
+INDEX_NAME = "documentos"
+CORRECTED_PATH = "./files/corrected_transcriptions"
+MATCH_PATH = "./files/matches"
 
 def hash_file(path):
     with open(path, "rb") as f:
         return hashlib.md5(f.read()).hexdigest()
     
 def indexation():
-    if not es.indices.exists(INDEX_NAME):
-        es.indices.create(INDEX_NAME)
+    if not es.indices.exists(index=INDEX_NAME):
+        es.indices.create(index=INDEX_NAME)
 
-    for file in os.listdir(INPUT):
+    for file in os.listdir(CORRECTED_PATH):
         if file.endswith(".txt"):
-            path = os.path.join(INPUT, file)
-            with open(path, "r", encoding="utf-8") as f:
+            path = os.path.join(CORRECTED_PATH, file)
+            with open(path, "r", encoding="windows-1252") as f:
                 content = f.read()
 
             doc = {
@@ -44,4 +47,18 @@ def find_terms(term):
     hits = results["hits"]["hits"]
 
     for hit in hits:
-        print(f"{hit['_source']['file']} (Score: {hit['_score']})")
+        timestamp = dt.now().strftime("%Y-%m-%d_%H-%M-%S")
+        output_file = os.path.join(MATCH_PATH, f"match_{term}_{timestamp}.json") 
+        data = {
+            "term" : term,
+            "file" : hit['_source']['file_name'],
+            "content" : hit['_source']['content'],
+            "score" : hit['_score']
+        }
+        with open(output_file, 'w+') as f:
+            json.dump(data, f, indent=4)
+
+if __name__ == "__main__":
+    #indexation()
+    term = "Listerine"
+    find_terms(term)

@@ -4,7 +4,7 @@ import time
 import re
 from symspellpy import SymSpell, Verbosity
 
-STT_PATH = "./files/raw_transcriptions/"
+STT_PATH = "./files/raw_transcriptions"
 SPELLCHECK_PATH = "./files/spellchecked_transcriptions/"
 
 sym_spell = SymSpell(max_dictionary_edit_distance=2, prefix_length=7)
@@ -29,7 +29,7 @@ def correct_text_file(input_file):
     return output_file
 
 if __name__ == "__main__":
-    input_txt = "./files/transcription.txt"
-    output_txt = correct_text_file(input_txt)
-
-    print(f"Corrected text saved to {output_txt}")
+    files = glob.glob(os.path.join(STT_PATH, '*.txt'))
+    for file in files:
+        output_file = correct_text_file(file)
+        print(f"Corrected text saved to {output_file}")

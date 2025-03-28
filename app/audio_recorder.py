@@ -29,7 +29,7 @@ def record_audio(duration,
                  chunk=CHUNK ):
     p = pyaudio.PyAudio()
     timestamp = dt.now().strftime("%Y-%m-%d_%H-%M-%S")
-    output_file = os.join.path(AUDIO_PATH, f"audio_output_{timestamp}.wav") 
+    output_file = os.path.join(AUDIO_PATH, f"audio_output_{timestamp}.wav") 
     stream = p.open(format=format,
                     channels=channels,
                     rate=rate,
@@ -63,5 +63,6 @@ def loop_execution(device_index):
         record_audio(RECORD_SECONDS, device_index)
 
 if __name__ == "__main__":
-    device_index = find_loopback_device()
-    file = record_audio(RECORD_SECONDS, device_index)
+    #device_index = find_loopback_device()
+    #file = record_audio(RECORD_SECONDS, device_index)
+    loop_execution(4)

@@ -4,13 +4,12 @@ import time
 import re
 from openai import OpenAI
 
-SPELLCHECK_PATH = "./files/spellchecked_transcriptions/"
+SPELLCHECK_PATH = "./files/spellchecked_transcriptions"
 CORRECTED_PATH = "./files/corrected_transcriptions/"
 
-INPUT_FILE = "./files/transcription_spellchecked.txt"
-OUTPUT_FILE = "./files/transcription_corrected.txt"
 INSTRUCTION = """
 Corrija o seguinte texto em casos onde a palavra possa estar mal escrita ou mal compreendida, para a palavra ou expressão mais próxima que mantenha a coerência geral do texto.
+Responda apenas com o texto corrigido.
 
 Texto:
 
@@ -44,3 +43,11 @@ def correct_text(input_file):
     
     return output_file
 
+if __name__ == "__main__":
+    initial_time = time.time()
+    files = glob.glob(os.path.join(SPELLCHECK_PATH, '*.txt'))
+    for file in files:
+        output_file = correct_text(file)
+        print(f"Corrected text saved to {output_file}")
+    duration = time.time() - initial_time
+    print(f"Took {duration} to process files.")

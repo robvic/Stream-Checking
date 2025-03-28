@@ -4,7 +4,7 @@ import time
 import re
 import speech_recognition as sr
 
-AUDIO_PATH = "./files/audios/"
+AUDIO_PATH = "./files/audios"
 STT_PATH = "./files/raw_transcriptions/"
 
 recognizer = sr.Recognizer()
@@ -32,3 +32,9 @@ def execution_loop():
     while True:
         recognize_file()
         time.sleep(30)
+
+if __name__ == "__main__":
+    files = glob.glob(os.path.join(AUDIO_PATH, '*.wav'))
+    for file in files:
+        print(file.replace('\\', '/'))
+        recognize_file(file.replace('\\', '/'))
